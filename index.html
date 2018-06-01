@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>jQuery input error plugin</title>
+	<script src="http://apps.bdimg.com/libs/jquery/1.8.1/jquery.min.js"></script>
+</head>
+<body>
+	<input id="ipt-number" type="text" placeholder="请输入！" style="outline:none;border:1px solid #ccc;height:28px;padding:0 7px;">
+	<script>
+	$(function() {
+		// err插件
+		$.fn.err = function(tip, autoHide) {
+		    return $(this).each(function() {
+		        var $me = $(this),
+		            oldBorderColor = $me.css('borderColor');
+		        tip = tip || '输入有误！';
+		        //不传递autoHide时默认为真
+		        console.log(typeof(autoHide));
+		        autoHide = typeof(autoHide) == 'undefined' ? 1 : autoHide;
+		        $me.css({
+		            'position': 'relative',
+		            'border-color': '#c87878'
+		        }).animate({
+		            'top': '-=10'
+		        }, 200).animate({
+		            'top': '+=10'
+		        }, 100).animate({
+		            'top': '-=5'
+		        }, 100).animate({
+		            'top': '+=5'
+		        }, 100, function() {
+		            $me.css('borderColor', oldBorderColor).tip();
+		        });
+		        $me.tip = function() {
+		            var $tip = $('<span class="err-tips">' + tip + '</span>'),
+		                tipStyle = {
+		                    'position': 'absolute',
+		                    'border': '1px solid #f6c8b5',
+		                    'padding': '1px 7px',
+		                    'fontSize': '12px',
+		                    'color': '#a40000',
+		                    'background-color': '#fceee8',
+		                    'zIndex': 1999,
+		                    'opacoty': 0.5,
+		                    'width': ($me.outerWidth() - 16) + 'px',
+		                    'top': $me.offset().top,
+		                    'left': $me.offset().left
+		                };
+		            $me.after($tip.css(tipStyle));
+		            $tip.animate({
+		                'opacity': 1,
+		                'top': $me.offset().top + $me.outerHeight() + 1
+		            }, 200);
+		            if (autoHide) {
+		                clearTimeout(t);
+		                var t = setTimeout(function() {
+		                    $tip.remove();
+		                }, 1500);
+		            }
+		            $me.on('keyup blur', function() {
+		                $tip.remove();
+		            });
+		        };
+		    });
+		};
+
+		//调用
+		$('#ipt-number').on('blur',function(){
+			var $me = $(this),
+				val = $me.val(),
+				rNumber = /\d+/g; 
+			!(rNumber.test(val)) && $me.err('至少输入一个数字！',false);
+		});
+	});
+	</script>
+</body>
+</html>
